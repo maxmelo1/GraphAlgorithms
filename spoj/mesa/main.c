@@ -96,24 +96,23 @@ static bool dfsRtwoColor( Graph G, vertex v, int c){
 
 int main(int argc, char const *argv[])
 {
-    int n, m, i;
+    int n, m, i, ii=0;
     Graph g;
 
-    scanf("%d %d", &n, &m);
+    while(scanf("%d %d", &n, &m)==2){
+      g = GRAPHinit(n);
 
-    g = GRAPHinit(n);
+      for(i=0; i<m; i++){
+         int u, v;
+         scanf("%d %d", &u, &v);
+         GRAPHinsertArc(g, --u, --v);
+      }
 
-    for(i=0; i<m; i++){
-        int u, v;
-        scanf("%d %d", &u, &v);
-        GRAPHinsertArc(g, --u, --v);
+      //GRAPHshow(g);
+
+      bool bip = UGRAPHtwoColor(g);
+      printf("Instancia %d\n%s\n", ++ii, (bip? "sim": "nao"));
     }
-
-    GRAPHshow(g);
-
-    bool bip = UGRAPHtwoColor(g);
-    printf("\n\n bipartite: %s", (bip? "True": "False"));
-    
 
     return 0;
 }

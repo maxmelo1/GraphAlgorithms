@@ -9,8 +9,9 @@
 // https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/bipartite.html
 
 #define vertex int
+#define MAX_VERTEX 100
 
-int color[1000];
+int color[MAX_VERTEX];
 
 typedef struct graph {
    int V; 
@@ -18,8 +19,8 @@ typedef struct graph {
    int **adj; 
 } *Graph;
 
-static int **MATRIXint( int, int, int);
-static bool dfsRtwoColor( Graph, vertex, int);
+int **MATRIXint( int, int, int);
+bool dfsRtwoColor( Graph, vertex, int);
 bool UGRAPHtwoColor(Graph);
 
 Graph GRAPHinit( int V) { 
@@ -30,7 +31,7 @@ Graph GRAPHinit( int V) {
    return G;
 }
 
-static int **MATRIXint( int r, int c, int val) { 
+int **MATRIXint( int r, int c, int val) { 
    int **m = malloc( r * sizeof (int *));
    for (vertex i = 0; i < r; ++i) 
       m[i] = malloc( c * sizeof (int));
@@ -40,15 +41,16 @@ static int **MATRIXint( int r, int c, int val) {
    return m;
 }
 
-void GRAPHinsertArc( Graph G, vertex v, vertex w) { 
+void GRAPHinsertArc( Graph G, vertex v, vertex w) {
    if (G->adj[v][w] == 0) {
-      G->adj[v][w] = 1; 
+      G->adj[v][w] = 1;
+      G->adj[w][v] = 1;
       G->A++;
    }
 }
 
 void GRAPHremoveArc( Graph G, vertex v, vertex w) { 
-   if (G->adj[v][w] == 1) {
+   if (G->adj[v][w]) {
       G->adj[v][w] = 0; 
       G->A--;
    }
@@ -64,7 +66,7 @@ void GRAPHshow(Graph G) {
    }
 }
 
-bool UGRAPHtwoColor(Graph G){ 
+bool UGRAPHtwoColor(Graph G){
    for (vertex v = 0; v < G->V; ++v)
       color[v] = -1; // incolor
    for (vertex v = 0; v < G->V; ++v)
@@ -74,16 +76,16 @@ bool UGRAPHtwoColor(Graph G){
    return true;
 }
 
-static bool dfsRtwoColor( Graph G, vertex v, int c){ 
+bool dfsRtwoColor( Graph G, vertex v, int c){ 
    color[v] = c;
-   for (int W = 0; W < G->V; W++) {
-      vertex w = G->adj[v][W];
-      if(!w)
+   for (int w = 0; w < G->V; w++) {
+      
+      if(! G->adj[v][w])
          continue;
       
       if (color[w] == -1) {
-         if (dfsRtwoColor( G, w, 1-c) == false) 
-            return false; 
+         if (! dfsRtwoColor( G, w, 1-c)) 
+            return false;
       }
       else { // v-w é de avanço ou de retorno
          if (color[w] == c) // base da recursão
@@ -96,11 +98,13 @@ static bool dfsRtwoColor( Graph G, vertex v, int c){
 
 int main(int argc, char const *argv[])
 {
-    int n, m, i, ii=0;
-    Graph g;
+   int n, m, i, ii=0;
+   Graph g;
 
-    while(scanf("%d %d", &n, &m)==2){
-      g = GRAPHinit(n);
+   while(scanf("%d %d", &n, &m)==2){
+      g = GRAPHinit(MAX_VERTEX);
+
+      if (n == 0 && m == 0) break;
 
       for(i=0; i<m; i++){
          int u, v;
@@ -111,8 +115,10 @@ int main(int argc, char const *argv[])
       //GRAPHshow(g);
 
       bool bip = UGRAPHtwoColor(g);
-      printf("Instancia %d\n%s\n", ++ii, (bip? "sim": "nao"));
-    }
+      
+      printf("Instancia %d\n%s\n\n", ++ii, (bip? "sim": "nao"));
+   }
 
     return 0;
 }
+
